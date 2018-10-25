@@ -16,7 +16,7 @@ class Vector {
             let newY = this.y + objVector.y;
             return new Vector(newX, newY);
         } else {
-            throw "Можно прибавлять к вектору только вектор типа Vector"
+            throw new Error("Можно прибавлять к вектору только вектор типа Vector");
         }
     }
 
@@ -33,4 +33,116 @@ const finish = start.plus(moveTo.times(2));
 
 console.log(`Исходное расположение: ${start.x}:${start.y}`);
 console.log(`Текущее расположение: ${finish.x}:${finish.y}`);
+
+
+// базовый класс Actor
+ 
+ class Actor {
+    constructor(
+        pos = new Vector(0, 0),
+        size = new Vector(1, 1),
+        speed = new Vector(0, 0),
+        ) {
+        if ((pos instanceof Vector) && (size instanceof Vector) && (speed instanceof Vector)) {
+            this.pos = pos;
+            this.size = size;
+            this.speed = speed;
+        } else {
+            throw new Error("Можно передавать только объект типа Vector");
+        }
+    }
+    get type() {
+        return "actor";
+    }
+
+    get left() {
+        return this.pos.x;
+    }
+    get top() {
+        return this.pos.y;
+    }
+    get right() {
+        return this.pos.x + this.size.x;
+    }
+    get bottom() {
+        return this.pos.y + this.size.y;
+    }
+
+    act() {
+
+    }
+
+    isIntersect(objActor) {
+        if (objActor === this) {
+            return false;
+        } else if ((objActor instanceof Actor) && (objActor !== undefined)) {
+            // Проверяем пересечение объекта this с objActor
+            // Исправить ошибки тестирования
+            if (((this.left < objActor.right) && (this.left > objActor.left) && (this.top > objActor.bottom) && (this.top < objActor.top)) ||
+                ((this.left < objActor.right) && (this.left > objActor.left) && (this.bottom < objActor.top) && (this.bottom > objActor.bottom)) ||
+                ((this.right > objActor.left) && (this.right < objActor.right) && (this.top > objActor.bottom) && (this.top < objActor.top)) ||
+                ((this.right > objActor.left) && (this.right < objActor.right) && (this.bottom < objActor.top) && (this.bottom > objActor.bottom)) ||
+                ((this.left === objActor.left) && (this.top === objActor.top) && (this.right === objActor.right) && (this.bottom === objActor.bottom))) {
+                return true;
+            }
+
+        } else {
+            throw new Error("Можно передавать только объект типа Actor");
+        }
+    }
+ }
+
+
+// code check
+const items = new Map();
+const player = new Actor();
+items.set('Игрок', player);
+items.set('Первая монета', new Actor(new Vector(10, 10)));
+items.set('Вторая монета', new Actor(new Vector(15, 5)));
+
+function position(item) {
+  return ['left', 'top', 'right', 'bottom']
+    .map(side => `${side}: ${item[side]}`)
+    .join(', ');  
+}
+
+function movePlayer(x, y) {
+  player.pos = player.pos.plus(new Vector(x, y));
+}
+
+function status(item, title) {
+  console.log(`${title}: ${position(item)}`);
+  if (player.isIntersect(item)) {
+    console.log(`Игрок подобрал ${title}`);
+  }
+}
+
+items.forEach(status);
+movePlayer(10, 10);
+items.forEach(status);
+movePlayer(5, -5);
+items.forEach(status);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
