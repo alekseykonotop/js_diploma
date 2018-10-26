@@ -35,6 +35,7 @@ console.log(`Исходное расположение: ${start.x}:${start.y}`);
 console.log(`Текущее расположение: ${finish.x}:${finish.y}`);
 
 
+
 // базовый класс Actor
  
  class Actor {
@@ -74,16 +75,47 @@ console.log(`Текущее расположение: ${finish.x}:${finish.y}`);
 
     isIntersect(objActor) {
         if (objActor === this) {
+
             return false;
         } else if ((objActor instanceof Actor) && (objActor !== undefined)) {
             // Проверяем пересечение объекта this с objActor
-            // Исправить ошибки тестирования
-            if (((this.left < objActor.right) && (this.left > objActor.left) && (this.top > objActor.bottom) && (this.top < objActor.top)) ||
-                ((this.left < objActor.right) && (this.left > objActor.left) && (this.bottom < objActor.top) && (this.bottom > objActor.bottom)) ||
-                ((this.right > objActor.left) && (this.right < objActor.right) && (this.top > objActor.bottom) && (this.top < objActor.top)) ||
-                ((this.right > objActor.left) && (this.right < objActor.right) && (this.bottom < objActor.top) && (this.bottom > objActor.bottom)) ||
-                ((this.left === objActor.left) && (this.top === objActor.top) && (this.right === objActor.right) && (this.bottom === objActor.bottom))) {
+            
+            // Вариант №1 определить условия соприкосновения
+            // if (((this.left < objActor.right) && (this.left > objActor.left) && (this.top > objActor.bottom) && (this.top < objActor.top)) ||
+            //     ((this.left < objActor.right) && (this.left > objActor.left) && (this.bottom < objActor.top) && (this.bottom > objActor.bottom)) ||
+            //     ((this.right > objActor.left) && (this.right < objActor.right) && (this.top > objActor.bottom) && (this.top < objActor.top)) ||
+            //     ((this.right > objActor.left) && (this.right < objActor.right) && (this.bottom < objActor.top) && (this.bottom > objActor.bottom)) ||
+            //     ((this.left === objActor.left) && (this.top === objActor.top) && (this.right === objActor.right) && (this.bottom === objActor.bottom)) ||
+            //     ((this.left < objActor.left) && (this.top > objActor.top) && (this.right > objActor.right) && (this.bottom < objActor.bottom))) {
+            //     return true;
+            // }
+            
+            // Вариант №2 определить условия соприкосновения
+            // Левая, верхняя, правая, нижняя границы объекта this
+            let L1 = this.left;
+            let T1 = this.top;
+            let R1 = this.right;
+            let B1 = this.bottom;
+            
+            // Левая, верхняя, правая, нижняя границы объекта objActor
+            let L2 = objActor.left;
+            let T2 = objActor.top;
+            let R2 = objActor.right;
+            let B2 = objActor.bottom;
+
+            let XCol = false;
+            let YCol = false;
+            if ((L1 == L2) && (R1 == R2)) XCol = true;
+            if ((T1 == T2) && (B1 == B2)) YCol = true;
+
+            // objActor полностью содержится в this
+            // if ((L1 > L2) && (R1 > R2) && (T1 > T2) && (B1 > B2)) XCol = false;
+            // if ((T1 > T2) && (B1 > B2)) YCol = false;
+            
+            if (XCol && YCol) {
                 return true;
+            } else {
+                return false;
             }
 
         } else {
