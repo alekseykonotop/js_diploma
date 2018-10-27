@@ -74,10 +74,9 @@ console.log(`Текущее расположение: ${finish.x}:${finish.y}`);
     }
 
     isIntersect(objActor) {
-        // let check = objActor instanceof Actor;
         if (objActor instanceof Actor && objActor !== undefined) {
             if (this === objActor) {
-                return false; // если вторым объектом передан сам 1-ый объект
+                return false;
             } else if (this.left === objActor.left &&
                        this.top === objActor.top &&
                        this.right === objActor.right &&
