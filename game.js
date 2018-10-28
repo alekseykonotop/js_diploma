@@ -317,8 +317,70 @@ class LevelParser {
     constructor(dict) {
         this.dict = dict;
     }
+
+    actorFromSymbol(symbol) {
+        if (symbol && symbol in this.dict) {
+            return this.dict[symbol];
+        } else {
+            return undefined;
+        }
+        
+    }
+
+    obstacleFromSymbol(symbol) {
+        if (symbol === 'x') {
+            return 'wall';
+        } else if (symbol === '!') {
+            return 'lava';
+        } else {
+            return undefined;
+        }
+    }
+
+    createGrid(arrayStr) {
+        let grid = [];
+        for (let line of arrayStr) {
+            let sectionGrid = [];
+            for (let char of line) {
+                sectionGrid.push(this.obstacleFromSymbol(char));
+            }
+            grid.push(sectionGrid);
+        }
+        return grid;
+    }
+
+    createActors(arrayStr) { // реализовать до конца метод
+        let actors = [];
+        for (let i = 0; i <= arrayStr.length -1; i++) {
+            for (let j = 0; j <= i.length - 1; j++) {
+                let actor = new this.actorFromSymbol(arrayStr[i][j])(new Vector(j, i));
+                if (actor instanceof Actor) {
+                   actors.push(actor); 
+                }
+            }
+        }
+        return actors;
+    }
 }
 
+
+// code check
+const plan = [
+  ' @ ',
+  'x!x'
+];
+
+const actorsDict = Object.create(null);
+actorsDict['@'] = Actor;
+
+const parser = new LevelParser(actorsDict);
+const level = parser.parse(plan);
+
+level.grid.forEach((line, y) => {
+  line.forEach((cell, x) => console.log(`(${x}:${y}) ${cell}`));
+});
+
+level.actors.forEach(actor => console.log(`(${actor.pos.x}:${actor.pos.y}) ${actor.type}`));
 
 
 
