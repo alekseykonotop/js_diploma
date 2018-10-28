@@ -144,14 +144,10 @@ console.log(`Текущее расположение: ${finish.x}:${finish.y}`);
 
 class Level {
     constructor(grid, actors) {
-        console.log('Start constructor');
         this.grid = grid,
         this.actors = actors,
         this.status = null,
         this.finishDelay = 1
-        console.log('this.grid-->', this.grid);
-        console.log('this.actors-->', this.actors);
-
     }
 
     get player() {
@@ -274,9 +270,6 @@ class Level {
 }
 
 
-
-
-
 // code check
 // const grid = [
 //   [undefined, undefined],
@@ -318,7 +311,13 @@ class Level {
 
 
 
+// класс LevelParser
 
+class LevelParser {
+    constructor(dict) {
+        this.dict = dict;
+    }
+}
 
 
 
