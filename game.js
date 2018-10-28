@@ -212,13 +212,13 @@ class Level {
         if (posVec instanceof Vector && sizeVec instanceof Vector) {
             // my logic
             let resVec = posVec.plus(sizeVec);
-            let resX = resVec.x - 1;
-            let resY = resVec.y - 1;
+            let resX = Math.floor(resVec.x - 1);
+            let resY = Math.floor(resVec.y - 1);
             
             if (((posVec.x % 1 != 0 || posVec.y % 1 != 0) || // если объект имеет не целочисленные координаты
                 (sizeVec.x % 1 != 0 || sizeVec.y % 1 != 0)) && // если объект имеет не целочисленный размер
                 ((this.grid[Math.floor(posVec.y)][Math.floor(posVec.x)] === 'wall') || // если площадь пересекается со стеной в начальной точке
-                (this.grid[Math.floor(resY)][Math.floor(resX)] === 'wall'))) {  // если площадь пересекается со стеной в конечной точке
+                (this.grid[resY][resX] === 'wall'))) {  // если площадь пересекается со стеной в конечной точке
                 
                 return 'wall';
             }
@@ -257,29 +257,45 @@ class Level {
         }
         return true; 
     }
+
+    playerTouched(typeObj, objActor) {
+        if (this.status === null) {
+            if (typeObj === 'lava' || typeObj === 'fireball') {
+                this.status = 'lost';
+            } 
+            if (typeObj === 'coin' && objActor instanceof Actor) {
+                this.removeActor(objActor);
+                if (this.noMoreActors(typeObj)) {
+                    this.status = 'won';
+                }
+            }
+        }
+    }
 }
 
 
 
 
-const grid = [
-  [undefined, undefined],
-  ['wall', 'wall']
-];
 
-function MyCoin(title) {
-  this.type = 'coin';
-  this.title = title;
-}
-MyCoin.prototype = Object.create(Actor);
-MyCoin.constructor = MyCoin;
+// code check
+// const grid = [
+//   [undefined, undefined],
+//   ['wall', 'wall']
+// ];
 
-const goldCoin = new MyCoin('Золото');
-const bronzeCoin = new MyCoin('Бронза');
-const player = new Actor();
-const fireball = new Actor();
+// function MyCoin(title) {
+//   this.type = 'coin';
+//   this.title = title;
+// }
+// MyCoin.prototype = Object.create(Actor);
+// MyCoin.constructor = MyCoin;
 
-const level = new Level(grid, [ goldCoin, bronzeCoin, player, fireball ]);
+// const goldCoin = new MyCoin('Золото');
+// const bronzeCoin = new MyCoin('Бронза');
+// const player = new Actor();
+// const fireball = new Actor();
+
+// const level = new Level(grid, [ goldCoin, bronzeCoin, player, fireball ]);
 
 // level.playerTouched('coin', goldCoin);
 // level.playerTouched('coin', bronzeCoin);
