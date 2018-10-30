@@ -349,13 +349,22 @@ class LevelParser {
         return grid;
     }
 
-    createActors(arrayStr) { // реализовать до конца метод
+    createActors(plan) {
         let actors = [];
-        for (let i = 0; i <= arrayStr.length -1; i++) {
-            for (let j = 0; j <= i.length - 1; j++) {
-                let actor = new this.actorFromSymbol(arrayStr[i][j])(new Vector(j, i));
-                if (actor instanceof Actor) {
-                   actors.push(actor); 
+        if (plan.length == 0 || this.dict === undefined) {
+            return actors;
+        }
+        
+        for (let i = 0; i <= plan.length -1; i++) {
+            for (let j = 0; j <= plan[i].length - 1; j++) {
+                if (plan[i][j] in this.dict) {
+                    let tempClass = this.actorFromSymbol(plan[i][j]);
+                    if (typeof(tempClass) === 'function') {
+                        let actor = new tempClass(new Vector(j, i));
+                        if (actor instanceof Actor) {
+                           actors.push(actor); 
+                        }
+                    }
                 }
             }
         }
