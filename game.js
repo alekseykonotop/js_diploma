@@ -381,24 +381,69 @@ class LevelParser {
 
 
 // code check
-const plan = [
-  ' @ ',
-  'x!x'
-];
+// const plan = [
+//   ' @ ',
+//   'x!x'
+// ];
 
-const actorsDict = Object.create(null);
-actorsDict['@'] = Actor;
+// const actorsDict = Object.create(null);
+// actorsDict['@'] = Actor;
 
-const parser = new LevelParser(actorsDict);
-const level = parser.parse(plan);
+// const parser = new LevelParser(actorsDict);
+// const level = parser.parse(plan);
 
-level.grid.forEach((line, y) => {
-  line.forEach((cell, x) => console.log(`(${x}:${y}) ${cell}`));
-});
+// level.grid.forEach((line, y) => {
+//   line.forEach((cell, x) => console.log(`(${x}:${y}) ${cell}`));
+// });
 
-level.actors.forEach(actor => console.log(`(${actor.pos.x}:${actor.pos.y}) ${actor.type}`));
+// level.actors.forEach(actor => console.log(`(${actor.pos.x}:${actor.pos.y}) ${actor.type}`));
 
 
+// класс Шаровая молния "Fireball"
+
+class Fireball extends Actor {
+    constructor(pos, speed) {
+        super(pos, undefined, speed);
+    }
+
+    get type() {
+        return 'fireball';
+    }
+
+    getNextPosition(time = 1) {
+        let distance = this.speed.times(time);
+        let newPos = this.pos.plus(distance);
+        return newPos;
+    }
+
+    handleObstacle() {
+         this.speed = this.speed.times(-1);
+    }
+
+    act(time, grid) {
+        let nextPosition = this.getNextPosition(time);
+        if (grid.obstacleAt(nextPosition, this.size) === undefined) {
+            this.pos = nextPosition;
+        } else {
+            this.handleObstacle();
+        }
+
+    }
+}
+
+
+// code check
+// const time = 5;
+// const speed = new Vector(1, 0);
+// const position = new Vector(5, 5);
+
+// const ball = new Fireball(position, speed);
+
+// const nextPosition = ball.getNextPosition(time);
+// console.log(`Новая позиция: ${nextPosition.x}: ${nextPosition.y}`);
+
+// ball.handleObstacle();
+// console.log(`Текущая скорость: ${ball.speed.x}: ${ball.speed.y}`);
 
 
 
