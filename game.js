@@ -445,7 +445,21 @@ class Fireball extends Actor {
 // ball.handleObstacle();
 // console.log(`Текущая скорость: ${ball.speed.x}: ${ball.speed.y}`);
 
+// класс HorizontalFireball
 
+class HorizontalFireball extends Fireball {
+    constructor(pos) {
+        super(pos, undefined, undefined);
+        this.speed = new Vector(2, 0);
+    }
+}
+
+class VerticalFireball extends Fireball {
+    constructor(pos) {
+        super(pos, undefined, undefined);
+        this.speed = new Vector(0, 2);
+    }
+}
 
 
 
