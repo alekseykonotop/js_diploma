@@ -102,10 +102,10 @@ console.log(`Текущее расположение: ${finish.x}:${finish.y}`);
     }
  }
 
- Object.defineProperty(Actor, 'type', {
-    writable: false,
-    value: 'actor'
- });
+ // Object.defineProperty(Actor, 'type', {
+ //    writable: false,
+ //    value: 'actor'
+ // });
 
 
 // code check
@@ -472,6 +472,43 @@ class FireRain extends Fireball {
     handleObstacle() {
         this.pos = this.startingPos;
     }
+}
+
+
+class Coin extends Actor {
+    constructor(pos) {
+        super(pos, undefined, undefined);
+        this.basePos = this.pos;
+        this.pos = this.pos.plus(new Vector(0.2, 0.1));
+        this.size = new Vector(0.6, 0.6);
+        this.spring = 2 * Math.random() * Math.PI;
+        this.springSpeed = 8;
+        this.springDist = 0.07;
+    }
+
+    get type() {
+        return 'coin';
+    }
+
+    updateSpring(time = 1) {
+        this.spring += this.springSpeed * time;
+    }
+
+    getSpringVector() {
+        let y = Math.sin(this.spring) * this.springDist;
+        return new Vector(0, y);
+    }
+
+    getNextPosition(time = 1) {
+        this.updateSpring(time);
+
+        return new Coin(this.basePos).pos.plus(this.getSpringVector());
+    }
+
+    act(time) {
+        let nextPos = this.getNextPosition(time);
+        this.pos = nextPos;
+    } 
 }
 
 
