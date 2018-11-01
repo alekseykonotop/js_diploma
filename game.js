@@ -28,7 +28,9 @@ class Actor {
         size = new Vector(1, 1),
         speed = new Vector(0, 0),
         ) {
-        if ((pos instanceof Vector) && (size instanceof Vector) && (speed instanceof Vector)) {
+        if ((pos instanceof Vector) && 
+            (size instanceof Vector) && 
+            (speed instanceof Vector)) {
             this.pos = pos;
             this.size = size;
             this.speed = speed;
