@@ -511,6 +511,17 @@ class Coin extends Actor {
     } 
 }
 
+class Player extends Actor {
+    constructor(pos) {
+        super(pos, new Vector(0.8, 1.5), undefined);
+        this.pos = this.pos.plus(new Vector(0, -0.5));
+    }
+
+    get type() {
+        return 'player';
+    }
+}
+
 
 
 
