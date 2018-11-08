@@ -70,14 +70,13 @@ class Actor {
             if (this === objActor) {
                 return false;
             }
-            // Проверка с объектом в той же точке, но имеющим отрицательный вектор размера
+
             if (this.pos.x == objActor.pos.x && this.pos.y == objActor.pos.y) {
                 if (objActor.size.x < 0 && objActor.size.y < 0) {
                     return false;
                 }
             }
 
-            // Проверяем смежные границы
             if ((this.left == objActor.right && this.left >= objActor.left) ||
                (this.right == objActor.left && this.right <= objActor.right) ||
                (this.top == objActor.bottom && this.top >= objActor.top) ||
@@ -92,7 +91,9 @@ class Actor {
                     return true;
                 }
             }
+            
             return false;
+        
         } else {
             throw new Error("Можно передавать только объект типа Actor");
         }
@@ -122,10 +123,8 @@ class Level {
         if (this.grid === undefined) {
             return 0;
         } else {
-            
             return this.grid.length;
         } 
-        
     }
 
     get width() {
@@ -138,6 +137,7 @@ class Level {
                     maxWidth = line.length;
                 }
             }
+            
             return maxWidth;
         } 
     }
@@ -157,6 +157,7 @@ class Level {
                     return actor;
                 }
             }
+            
             return undefined;
         } else {
             throw new Error("Можно передавать только объект типа Actor");
@@ -228,7 +229,6 @@ class Level {
                     this.status = 'won';
                 }
             }
-
         }
     }
 }
@@ -245,7 +245,6 @@ class LevelParser {
         } else {
             return undefined;
         }
-        
     }
 
     obstacleFromSymbol(symbol) {
@@ -260,6 +259,7 @@ class LevelParser {
 
     createGrid(arrayStr) {
         let grid = [];
+
         for (let line of arrayStr) {
             let sectionGrid = [];
             for (let char of line) {
@@ -267,11 +267,13 @@ class LevelParser {
             }
             grid.push(sectionGrid);
         }
+        
         return grid;
     }
 
     createActors(plan) {
         let actors = [];
+
         if (plan.length == 0 || this.dict === undefined) {
             return actors;
         }
@@ -289,6 +291,7 @@ class LevelParser {
                 }
             }
         }
+        
         return actors;
     }
 
@@ -313,6 +316,7 @@ class Fireball extends Actor {
     getNextPosition(time = 1) {
         let distance = this.speed.times(time);
         let newPos = this.pos.plus(distance);
+        
         return newPos;
     }
 
@@ -322,12 +326,12 @@ class Fireball extends Actor {
 
     act(time, grid) {
         let nextPosition = this.getNextPosition(time);
+        
         if (grid.obstacleAt(nextPosition, this.size) === undefined) {
             this.pos = nextPosition;
         } else {
             this.handleObstacle();
         }
-
     }
 }
 
@@ -382,6 +386,7 @@ class Coin extends Actor {
 
     getSpringVector() {
         let y = Math.sin(this.spring) * this.springDist;
+        
         return new Vector(0, y);
     }
 
