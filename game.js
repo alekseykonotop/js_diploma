@@ -1,5 +1,7 @@
 'use strict'
 
+const stack = [];
+
 class Vector {
     constructor( x=0, y=0 ) {
         this.x = x;
@@ -46,14 +48,17 @@ class Actor {
     get left() {
         return this.pos.x;
     }
+
     get top() {
         return this.pos.y;
     }
+
     get right() {
-        return this.pos.x + this.size.x;
+        return this.pos.plus(this.size).x;
     }
+
     get bottom() {
-        return this.pos.y + this.size.y;
+        return this.pos.plus(this.size).y;
     }
 
     act() {
@@ -61,30 +66,36 @@ class Actor {
     }
 
     isIntersect(objActor) {
-        if (objActor instanceof Actor && objActor !== undefined) {
+        if ( objActor !== undefined && objActor instanceof Actor ) {
             if (this === objActor) {
                 return false;
-            } else if (this.left === objActor.left &&
-                       this.top === objActor.top &&
-                       this.right === objActor.right &&
-                       this.bottom === objActor.bottom) {
-                return true;
-            } else {
-                for (let i = this.left + 1; i <= this.right - 1; i++) {
-                    if (i >= objActor.left && i <= objActor.right) {
-                        for (let j = this.top + 1; j <= this.bottom - 1; j++) {
-                            if (j >= objActor.top && j <= objActor.bottom) {
-                                return true;
-                            }
-                        }
-                    }
+            }
+            // Проверка с объектом в той же точке, но имеющим отрицательный вектор размера
+            if (this.pos.x == objActor.pos.x && this.pos.y == objActor.pos.y) {
+                if (objActor.size.x < 0 && objActor.size.y < 0) {
+                    return false;
+                }
+            }
+
+            // Проверяем смежные границы
+            if ((this.left == objActor.right && this.left >= objActor.left) ||
+               (this.right == objActor.left && this.right <= objActor.right) ||
+               (this.top == objActor.bottom && this.top >= objActor.top) ||
+               (this.bottom == objActor.top && this.bottom <= objActor.bottom)) {
+                return false;
+               }
+
+            if ((objActor.left >= this.left &&  objActor.left <= this.right) || 
+                (objActor.right <= this.right &&  objActor.right >= this.left)) {
+                if ((objActor.top >= this.top && objActor.top <= this.bottom) ||
+                    (objActor.bottom >= this.top && objActor.bottom <= this.bottom)) {
+                    return true;
                 }
             }
             return false;
         } else {
             throw new Error("Можно передавать только объект типа Actor");
         }
-        
     }
  }
 
@@ -132,16 +143,17 @@ class Level {
     }
 
     isFinished() {
-        return (this.status !== 1 && this.finishDelay < 0) ? true : false;
+        return (this.status !== null && this.finishDelay < 0) ? true : false;
     }
 
     actorAt(objActor) {
         if (this.grid === undefined && this.actors === undefined) {
             return undefined;
         }
-        if (objActor instanceof Actor && objActor !== undefined) {
+
+        if ( objActor !== undefined && objActor instanceof Actor ) {
             for (let actor of this.actors) {
-                if (actor.isIntersect(objActor)) {
+                if (objActor.isIntersect(actor)) {
                     return actor;
                 }
             }
@@ -151,40 +163,45 @@ class Level {
         }
     }
 
+
     obstacleAt(posVec, sizeVec) {
         if (posVec instanceof Vector && sizeVec instanceof Vector) {
-            // my logic
-            let resVec = posVec.plus(sizeVec);
-            let resX = Math.floor(resVec.x - 1);
-            let resY = Math.floor(resVec.y - 1);
-            
-            if (((posVec.x % 1 != 0 || posVec.y % 1 != 0) || // если объект имеет не целочисленные координаты
-                (sizeVec.x % 1 != 0 || sizeVec.y % 1 != 0)) && // если объект имеет не целочисленный размер
-                ((this.grid[Math.floor(posVec.y)][Math.floor(posVec.x)] === 'wall') || // если площадь пересекается со стеной в начальной точке
-                (this.grid[resY][resX] === 'wall'))) {  // если площадь пересекается со стеной в конечной точке
-                
+            const resVec = posVec.plus(sizeVec);
+
+            if (Math.ceil(resVec.y) > this.height) {
+                return 'lava';
+            } else if (posVec.y < 0 || posVec.x < 0 || resVec.x > this.width) {
                 return 'wall';
             }
 
-            // проверяем выходит ли объект за пределы поля
-            if (resY >= this.height - 1) {
+            const valueInBasePos = this.grid[Math.floor(posVec.y)][Math.floor(posVec.x)];
+            const valueInUpRightPos = this.grid[Math.floor(posVec.y)][Math.ceil(resVec.x)-1];
+            const valueInlowLeftPos = this.grid[Math.ceil(resVec.y)-1][Math.floor(posVec.x)];
+            const valueInResVecPos = this.grid[Math.ceil(resVec.y)-1][Math.ceil(resVec.x)-1];
+
+            if (valueInBasePos === 'lava' ||
+                valueInUpRightPos === 'lava' ||
+                valueInlowLeftPos === 'lava' ||
+                valueInResVecPos === 'lava') {
                 return 'lava';
-            } else if (posVec.y < 0 || posVec.x < 0 || resX > this.width - 1) {
+            }
+            if (valueInBasePos === 'wall' ||
+                valueInUpRightPos === 'wall' ||
+                valueInlowLeftPos === 'wall' ||
+                valueInResVecPos === 'wall') {
                 return 'wall';
             }
-            
-            return this.grid[resY][resX] ? this.grid[resY][resX] : undefined;
+
+            return undefined;
+
         } else {
             throw new Error("Можно передавать только объекты типа Vector");
         }
     }
 
     removeActor(objActor) {
-        for (let i = 0; i <= this.actors.length - 1; i++) {
-            if (this.actors[i] === objActor) {
-                this.actors.splice(i, 1);
-                return;
-            }
+        if (this.actors.indexOf(objActor) >= 0) {
+            this.actors.splice(this.actors.indexOf(objActor), 1);
         }
     }
 
@@ -205,13 +222,13 @@ class Level {
         if (this.status === null) {
             if (typeObj === 'lava' || typeObj === 'fireball') {
                 this.status = 'lost';
-            } 
-            if (typeObj === 'coin' && objActor instanceof Actor) {
+            } else if (typeObj === 'coin') {
                 this.removeActor(objActor);
                 if (this.noMoreActors(typeObj)) {
                     this.status = 'won';
                 }
             }
+
         }
     }
 }
@@ -277,7 +294,7 @@ class LevelParser {
 
     parse(strArray) {
         let grid = this.createGrid(strArray);
-        let actors = this.createActors(strArray)
+        let actors = this.createActors(strArray);
 
         return new Level(grid, actors);
     }
@@ -392,8 +409,38 @@ class Player extends Actor {
 }
 
 
-
-
+const schemas = [
+  [
+    '         ',
+    '         ',
+    '   =     ',
+    '       o ',
+    ' @   !xxx',
+    '  o      ',
+    'xxx!     ',
+    '         '
+  ],
+  [
+    '      v  ',
+    '       v ',
+    '  v      ',
+    '        o',
+    '        x',
+    '@   x    ',
+    'x        ',
+    '         '
+  ]
+];
+const actorDict = {
+  '@': Player,
+  'v': FireRain,
+  '=': HorizontalFireball,
+  'o': Coin,
+  '|': VerticalFireball,
+}
+const parser = new LevelParser(actorDict);
+runGame(schemas, parser, DOMDisplay)
+  .then(() => alert('Вы выиграли приз!'));
 
 
 
