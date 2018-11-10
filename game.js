@@ -8,10 +8,10 @@ class Vector {
         this.y = y
     }
 
-    plus(objVector) {
-        if (objVector instanceof Vector) {
-            let newX = this.x + objVector.x;
-            let newY = this.y + objVector.y;
+    plus(vector) {
+        if (vector instanceof Vector) {
+            let newX = this.x + vector.x;
+            let newY = this.y + vector.y;
             return new Vector(newX, newY);
         } else {
             throw new Error("Можно прибавлять к вектору только вектор типа Vector");
@@ -65,29 +65,29 @@ class Actor {
 
     }
 
-    isIntersect(objActor) {
-        if ( objActor !== undefined && objActor instanceof Actor ) {
-            if (this === objActor) {
+    isIntersect(actor) {
+        if (actor !== undefined && actor instanceof Actor) {
+            if (this === actor) {
                 return false;
             }
 
-            if (this.pos.x == objActor.pos.x && this.pos.y == objActor.pos.y) {
-                if (objActor.size.x < 0 && objActor.size.y < 0) {
+            if (this.pos.x == actor.pos.x && this.pos.y == actor.pos.y) {
+                if (actor.size.x < 0 && actor.size.y < 0) {
                     return false;
                 }
             }
 
-            if ((this.left == objActor.right && this.left >= objActor.left) ||
-               (this.right == objActor.left && this.right <= objActor.right) ||
-               (this.top == objActor.bottom && this.top >= objActor.top) ||
-               (this.bottom == objActor.top && this.bottom <= objActor.bottom)) {
+            if ((this.left == actor.right && this.left >= actor.left) ||
+                (this.right == actor.left && this.right <= actor.right) ||
+                (this.top == actor.bottom && this.top >= actor.top) ||
+                (this.bottom == actor.top && this.bottom <= actor.bottom)) {
                 return false;
                }
 
-            if ((objActor.left >= this.left &&  objActor.left <= this.right) || 
-                (objActor.right <= this.right &&  objActor.right >= this.left)) {
-                if ((objActor.top >= this.top && objActor.top <= this.bottom) ||
-                    (objActor.bottom >= this.top && objActor.bottom <= this.bottom)) {
+            if ((actor.left >= this.left &&  actor.left <= this.right) || 
+                (actor.right <= this.right &&  actor.right >= this.left)) {
+                if ((actor.top >= this.top && actor.top <= this.bottom) ||
+                    (actor.bottom >= this.top && actor.bottom <= this.bottom)) {
                     return true;
                 }
             }
@@ -146,15 +146,15 @@ class Level {
         return (this.status !== null && this.finishDelay < 0) ? true : false;
     }
 
-    actorAt(objActor) {
+    actorAt(actor) {
         if (this.grid === undefined && this.actors === undefined) {
             return undefined;
         }
 
-        if ( objActor !== undefined && objActor instanceof Actor ) {
-            for (let actor of this.actors) {
-                if (objActor.isIntersect(actor)) {
-                    return actor;
+        if (actor !== undefined && actor instanceof Actor) {
+            for (let essence of this.actors) {
+                if (actor.isIntersect(essence)) {
+                    return essence;
                 }
             }
             
@@ -165,20 +165,20 @@ class Level {
     }
 
 
-    obstacleAt(posVec, sizeVec) {
-        if (posVec instanceof Vector && sizeVec instanceof Vector) {
-            const resVec = posVec.plus(sizeVec);
+    obstacleAt(pos, size) {
+        if (pos instanceof Vector && size instanceof Vector) {
+            const endPos = pos.plus(size);
 
-            if (Math.ceil(resVec.y) > this.height) {
+            if (Math.ceil(endPos.y) > this.height) {
                 return 'lava';
-            } else if (posVec.y < 0 || posVec.x < 0 || resVec.x > this.width) {
+            } else if (pos.y < 0 || pos.x < 0 || endPos.x > this.width) {
                 return 'wall';
             }
 
-            const valueInBasePos = this.grid[Math.floor(posVec.y)][Math.floor(posVec.x)];
-            const valueInUpRightPos = this.grid[Math.floor(posVec.y)][Math.ceil(resVec.x)-1];
-            const valueInlowLeftPos = this.grid[Math.ceil(resVec.y)-1][Math.floor(posVec.x)];
-            const valueInResVecPos = this.grid[Math.ceil(resVec.y)-1][Math.ceil(resVec.x)-1];
+            const valueInBasePos = this.grid[Math.floor(pos.y)][Math.floor(pos.x)];
+            const valueInUpRightPos = this.grid[Math.floor(pos.y)][Math.ceil(endPos.x)-1];
+            const valueInlowLeftPos = this.grid[Math.ceil(endPos.y)-1][Math.floor(pos.x)];
+            const valueInResVecPos = this.grid[Math.ceil(endPos.y)-1][Math.ceil(endPos.x)-1];
 
             if (valueInBasePos === 'lava' ||
                 valueInUpRightPos === 'lava' ||
@@ -200,32 +200,32 @@ class Level {
         }
     }
 
-    removeActor(objActor) {
-        if (this.actors.indexOf(objActor) >= 0) {
-            this.actors.splice(this.actors.indexOf(objActor), 1);
+    removeActor(actor) {
+        if (this.actors.indexOf(actor) >= 0) {
+            this.actors.splice(this.actors.indexOf(actor), 1);
         }
     }
 
-    noMoreActors(typeObj) {
+    noMoreActors(type) {
         if (this.actors === undefined || this.actors.length === 0) {
             return true;
         }
 
         for (let actor of this.actors) {
-            if (actor.type === typeObj) {
+            if (actor.type === type) {
                 return false;
             }
         }
         return true; 
     }
 
-    playerTouched(typeObj, objActor) {
+    playerTouched(type, actor) {
         if (this.status === null) {
-            if (typeObj === 'lava' || typeObj === 'fireball') {
+            if (type === 'lava' || type === 'fireball') {
                 this.status = 'lost';
-            } else if (typeObj === 'coin') {
-                this.removeActor(objActor);
-                if (this.noMoreActors(typeObj)) {
+            } else if (type === 'coin') {
+                this.removeActor(actor);
+                if (this.noMoreActors(type)) {
                     this.status = 'won';
                 }
             }
@@ -257,10 +257,10 @@ class LevelParser {
         }
     }
 
-    createGrid(arrayStr) {
+    createGrid(planLevels) {
         let grid = [];
 
-        for (let line of arrayStr) {
+        for (let line of planLevels) {
             let sectionGrid = [];
             for (let char of line) {
                 sectionGrid.push(this.obstacleFromSymbol(char));
@@ -271,17 +271,17 @@ class LevelParser {
         return grid;
     }
 
-    createActors(plan) {
+    createActors(planActors) {
         let actors = [];
 
-        if (plan.length == 0 || this.dict === undefined) {
+        if (planActors.length == 0 || this.dict === undefined) {
             return actors;
         }
         
-        for (let i = 0; i <= plan.length -1; i++) {
-            for (let j = 0; j <= plan[i].length - 1; j++) {
-                if (plan[i][j] in this.dict) {
-                    let tempClass = this.actorFromSymbol(plan[i][j]);
+        for (let i = 0; i <= planActors.length -1; i++) {
+            for (let j = 0; j <= planActors[i].length - 1; j++) {
+                if (planActors[i][j] in this.dict) {
+                    let tempClass = this.actorFromSymbol(planActors[i][j]);
                     if (typeof(tempClass) === 'function') {
                         let actor = new tempClass(new Vector(j, i));
                         if (actor instanceof Actor) {
@@ -295,9 +295,9 @@ class LevelParser {
         return actors;
     }
 
-    parse(strArray) {
-        let grid = this.createGrid(strArray);
-        let actors = this.createActors(strArray);
+    parse(fieldPlan) {
+        let grid = this.createGrid(fieldPlan);
+        let actors = this.createActors(fieldPlan);
 
         return new Level(grid, actors);
     }
@@ -397,8 +397,8 @@ class Coin extends Actor {
     }
 
     act(time) {
-        let nextPos = this.getNextPosition(time);
-        this.pos = nextPos;
+        let nextPosition = this.getNextPosition(time);
+        this.pos = nextPosition;
     } 
 }
 
@@ -427,13 +427,6 @@ const parser = new LevelParser(actorDict);
 
 loadLevels()
     .then(schema => runGame(JSON.parse(schema), parser, DOMDisplay))
-    .then(() => alert(`ВЫ ПОБЕДИЛИ!!!`));
-    
-
-
-
-
-
-
+    .then(() => alert(`YOU ARE WON!!!`));
 
 
