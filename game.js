@@ -29,13 +29,13 @@ class Actor {
         size = new Vector(1, 1),
         speed = new Vector(0, 0),
         ) {
-        
+
         if (pos.constructor !== Vector ||
             size.constructor !== Vector ||
             speed.constructor !== Vector) {
             throw new Error("Можно передавать только объект типа Vector");
         }
-
+        
         this.pos = pos;
         this.size = size;
         this.speed = speed;
@@ -230,7 +230,6 @@ class LevelParser {
     }
 
     obstacleFromSymbol(symbol) {
-        // Словарь
         const obstacle = {
             'x': 'wall',
             '!': 'lava'
@@ -318,24 +317,21 @@ class Fireball extends Actor {
 
 class HorizontalFireball extends Fireball {
     constructor(pos) {
-        super(pos, undefined, undefined);
-        this.speed = new Vector(2, 0);
+        super(pos, new Vector(2, 0));
     }
 }
 
 
 class VerticalFireball extends Fireball {
     constructor(pos) {
-        super(pos, undefined, undefined);
-        this.speed = new Vector(0, 2);
+        super(pos, new Vector(0, 2));
     }
 }
 
 
 class FireRain extends Fireball {
     constructor(pos) {
-        super(pos, undefined, undefined);
-        this.speed = new Vector(0, 3);
+        super(pos, new Vector(0, 3));
         this.startingPos = pos;
     }
 
@@ -347,10 +343,9 @@ class FireRain extends Fireball {
 
 class Coin extends Actor {
     constructor(pos) {
-        super(pos, undefined, undefined);
+        super(pos, new Vector(0.6, 0.6), undefined);
         this.basePos = this.pos;
         this.pos = this.pos.plus(new Vector(0.2, 0.1));
-        this.size = new Vector(0.6, 0.6);
         this.spring = 2 * Math.random() * Math.PI;
         this.springSpeed = 8;
         this.springDist = 0.07;
