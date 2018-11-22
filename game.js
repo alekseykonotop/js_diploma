@@ -101,21 +101,16 @@ class Actor {
 
 
 class Level {
-    constructor(grid, actors) {
-        this.grid = (grid instanceof Array) ? grid : [],
-        this.actors = (actors instanceof Array) ? actors : [],
+    constructor(grid = new Array(), actors = new Array()) {
+        this.grid = grid,
+        this.actors = actors,
         this.status = null,
         this.finishDelay = 1
     }
 
     get player() {
-        if (this.actors) {
-            for (let actor of this.actors) {
-                if (actor.type === 'player') {
-                    return actor;
-                }
-            }
-        }
+        
+        return this.actors.find(actor => actor.type === 'player');
     }
 
     get height() {
@@ -144,11 +139,7 @@ class Level {
                 throw new Error("Можно передавать только объект типа Actor");
             }
 
-        for (let essence of this.actors) {
-            if (actor.isIntersect(essence)) {
-                return essence;
-            }
-        }
+        return this.actors.find(essence => actor.isIntersect(essence));
     }
 
     
