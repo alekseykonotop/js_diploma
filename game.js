@@ -149,10 +149,10 @@ class Level {
             throw new Error("Можно передавать только объекты типа Vector");
         }
 
-        var xStart = Math.floor(pos.x);
-        var xEnd = Math.ceil(pos.x + size.x);
-        var yStart = Math.floor(pos.y);
-        var yEnd = Math.ceil(pos.y + size.y);
+        const xStart = Math.floor(pos.x);
+        const xEnd = Math.ceil(pos.x + size.x);
+        const yStart = Math.floor(pos.y);
+        const yEnd = Math.ceil(pos.y + size.y);
 
         if (Math.ceil(yEnd) > this.height) {
             return 'lava';
@@ -174,9 +174,9 @@ class Level {
             }
         }
 
-        for (var y = yStart; y < yEnd; y++) {
-            for (var x = xStart; x < xEnd; x++) {
-                var fieldType = this.grid[y][x];
+        for (let y = yStart; y < yEnd; y++) {
+            for (let x = xStart; x < xEnd; x++) {
+                let fieldType = this.grid[y][x];
                 if (fieldType) {
                     return fieldType;
                 }
@@ -252,7 +252,7 @@ class LevelParser {
                     if (planActors[i][j] in this.dict) {
                         let actorClass = this.actorFromSymbol(planActors[i][j]);
                         if (typeof(actorClass) === 'function') {
-                            let actor = new actorClass(new Vector(j, i));
+                            const actor = new actorClass(new Vector(j, i));
                             if (actor instanceof Actor) {
                                actors.push(actor); 
                             }
@@ -266,8 +266,8 @@ class LevelParser {
     }
 
     parse(fieldPlan) {
-        let grid = this.createGrid(fieldPlan);
-        let actors = this.createActors(fieldPlan);
+        const grid = this.createGrid(fieldPlan);
+        const actors = this.createActors(fieldPlan);
 
         return new Level(grid, actors);
     }
@@ -284,8 +284,8 @@ class Fireball extends Actor {
     }
 
     getNextPosition(time = 1) {
-        let distance = this.speed.times(time);
-        let newPos = this.pos.plus(distance);
+        const distance = this.speed.times(time);
+        const newPos = this.pos.plus(distance);
         
         return newPos;
     }
@@ -295,7 +295,7 @@ class Fireball extends Actor {
     }
 
     act(time, grid) {
-        let nextPosition = this.getNextPosition(time);
+        const nextPosition = this.getNextPosition(time);
 
         if (grid.obstacleAt(nextPosition, this.size)) {
             this.handleObstacle();
@@ -351,7 +351,7 @@ class Coin extends Actor {
     }
 
     getSpringVector() {
-        let y = Math.sin(this.spring) * this.springDist;
+        const y = Math.sin(this.spring) * this.springDist;
         
         return new Vector(0, y);
     }
@@ -363,7 +363,7 @@ class Coin extends Actor {
     }
 
     act(time) {
-        let nextPosition = this.getNextPosition(time);
+        const nextPosition = this.getNextPosition(time);
         this.pos = nextPosition;
     } 
 }
